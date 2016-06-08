@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <string>
 
 class RLE
@@ -14,7 +15,9 @@ private:
 	std::ifstream in;
 	std::ofstream out;
 	
-	unsigned char get_T(int type, int size);
+	unsigned char set_T(int type, int size);
+	void get_T(unsigned char T, int &opt, int &size);
+	void flush(int type, std::vector<char> v);
 
 public:
 	RLE();
