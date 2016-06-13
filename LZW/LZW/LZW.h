@@ -23,6 +23,7 @@ public:
 
 	void add(std::string str);
 	int get(std::string str);
+	std::string get(int idx);
 	int size();
 	void show();
 

@@ -89,12 +89,16 @@ void LZW::compress()
 		else
 		{
 			table.add(PC);
-			out << table.get(P);
+			char output = table.get(P);
+			out << output;
 			P = C;
 		}
 	}
 
 	table.show();
+
+	in.clear();
+	in.seekg(0, std::ios::beg);
 }
 
 void LZW::decompress()
@@ -102,6 +106,15 @@ void LZW::decompress()
 	char ch;
 	std::string chh;
 	int table_size;
+
+	int pW = -1;
+	int cW =-1;
+	std::string str_pW;
+	std::string str_cW;
+
+	std::string P;
+	std::string C;
+	std::string PC;
 
 	std::cout << "decompress\n";
 
@@ -117,6 +130,26 @@ void LZW::decompress()
 	}
 
 	table.show();
+
+	in.get(ch);
+
+	pW = ch;
+	str_pW = table.get(pW);
+	out << table.get(pW);
+
+	while(in.get(ch))
+	{
+		std::cout << "ch: " << (int)ch << std::endl;
+
+		cW = ch;
+		str_cW = table.get(cW);
+		out << table.get(cW);
+
+		table.add(str_pW + str_cW[0]);
+
+		pW = cW;
+		str_pW = str_cW;
+	}
 }
 
 /***************************************************/
@@ -160,6 +193,18 @@ int Table::get(std::string str)
 	}
 
 	return -1;
+}
+
+std::string Table::get(int idx)
+{
+	for (int i = 0; i < table.size(); i++)
+	{
+		if (table[i]->num == idx)
+			return table[i]->token;
+	}
+
+	/* Never get here */
+	return "";
 }
 
 int Table::size()
