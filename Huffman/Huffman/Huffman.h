@@ -16,29 +16,41 @@ private:
 	std::ifstream in;
 	std::ofstream out;
 
+	int arr[100];
+
 	struct node
 	{
 		char ch;
 		int freq;
 
-		struct node *left;
-		struct node *right;
+		node*left;
+		node*right;
 	};
 
 	struct MyComparator {
-		bool operator() (struct node *arg1, struct node *arg2)
+		bool operator() (node *arg1, node *arg2)
 		{
-			return arg1->freq < arg2->freq;
+			return arg1->freq > arg2->freq;
 		}
 	};
 
-	std::priority_queue<struct node *,
-	                    std::vector<struct node *>,
+	std::priority_queue<node*,
+	                    std::vector<node*>,
 						MyComparator> queue;
 
-	struct node *head = NULL;
+	node*head = NULL;
+
+	struct table_node
+	{
+		int data;
+		int size;
+		int ch;
+	};
+
+	std::vector <table_node *> table;
 
 	void huffman_tree_create();
+	void huffman_tree_create_table(node*n, int num, int depth);
 
 public:
 	Huffman();

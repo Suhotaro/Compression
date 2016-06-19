@@ -1,4 +1,4 @@
 all: decompress
    
 decompress: main.cpp ../Huffman/Huffman.cpp ../Huffman/Huffman.h
-	g++ main.cpp ../Huffman/Huffman.cpp -o decompress
+	g++ -L../lib  -o decompress main.cpp ../Huffman/Huffman.cpp -lbitrw

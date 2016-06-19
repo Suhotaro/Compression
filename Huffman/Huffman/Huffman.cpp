@@ -1,10 +1,17 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+
+extern "C" {
+#include "bitrw.h"
+}
+
 #include "Huffman.h"
 
 Huffman::Huffman(std::string src, std::string dst)
 {
+	int ret = 0;
+
 	if (src.size() == 0 || dst.size() == 0)
 	{
 		std::cout << "files are NULL\n";
@@ -18,8 +25,8 @@ Huffman::Huffman(std::string src, std::string dst)
 		return;
 	}
 
-	out.open(dst.c_str());
-	if(out.fail())
+	ret = bitrw_init(dst.c_str());
+	if(ret != 1)
 	{
 		std::cout << "failed open dst file\n";
 		return;
@@ -33,6 +40,8 @@ Huffman::~Huffman()
 
 	if (out.is_open())
 		out.close();
+
+	bitrw_deinit();
 }
 
 void Huffman::set_src_file(std::string src)
@@ -51,9 +60,33 @@ void Huffman::compress()
 	int size = 0;
 	int found = 0;
 
-	struct node *t = NULL;
-	std::vector <struct node *> table;
+	node *t = NULL;
+	std::vector <node *> tmp_table;
 
+
+	int a[6][2] =
+	{
+		{'f', 5},
+		{'e', 9},
+		{'a', 45},
+		{'b', 13},
+		{'d', 16},
+		{'c', 12},
+	};
+
+	for (int i = 0; i < 6; i++)
+	{
+		node *n = new node;
+		n->ch = a[i][0];
+		n->freq = a[i][1];
+
+		n->left = NULL;
+		n->right = NULL;
+
+		tmp_table.push_back(n);
+	}
+
+/*
 	while (in.get(ch))
 	{
 		found = 0;
@@ -71,7 +104,7 @@ void Huffman::compress()
 		if (found == 1)
 			continue;
 
-		struct node *n = new struct node;
+		node *n = new node;
 		n->ch = ch;
 		n->freq = 1;
 
@@ -80,11 +113,12 @@ void Huffman::compress()
 
 		table.push_back(n);
 	}
-
-	for (int i = 0; i < table.size(); i++)
+*/
+	for (int i = 0; i < tmp_table.size(); i++)
 	{
-		queue.push(table[i]);
+		queue.push(tmp_table[i]);
 	}
+
 
 /*
 	for (int i = 0; i < table.size(); i++)
@@ -96,7 +130,20 @@ void Huffman::compress()
 	}
 */
 
+
 	huffman_tree_create();
+
+	huffman_tree_create_table(head, -1, -1);
+
+/*
+	for (int i =0; i < table.size(); i++)
+	{
+		table_node * tmp = table[i];
+		printf("ch:%c  data:%d  size:%d\n",
+			   tmp->ch, tmp->data, tmp->size );
+	}
+*/
+
 
 	std::cout << "compress\n";
 }
@@ -105,15 +152,15 @@ void Huffman::huffman_tree_create()
 {
 	int n = queue.size();
 
-	struct node *x, *y, *z;
+	node *x, *y, *z;
 
 	for (int i = 0; i < (n-1); i++)
 	{
-		z = new struct node;
+		z = new node;
 		z->left = x = queue.top();
 		queue.pop();
 
-		z->left = y = queue.top();
+		z->right = y = queue.top();
 		queue.pop();
 
 		z->ch = 0;
@@ -123,9 +170,35 @@ void Huffman::huffman_tree_create()
 	}
 
 	head = queue.top();
-	printf("%c  %d\n", head->ch, head->freq);
+	queue.pop();
 }
 
+void Huffman::huffman_tree_create_table(node *n, int num, int depth)
+{
+	if (n == NULL)
+		return;
+
+	if (num != -1)
+	{
+		arr[depth] = num;
+
+		if (n->ch != 0)
+		{
+			table_node *tmp = new table_node;
+			tmp->ch = n->ch;
+			tmp->size = depth;
+			tmp->data = 0;
+
+			for (int i = depth, j = 0; i >= 0; i--, j++)
+				tmp->data |= (arr[i] << j);
+
+			table.push_back(tmp);
+		}
+	}
+
+	Huffman::huffman_tree_create_table(n->left, 0, depth+1);
+	Huffman::huffman_tree_create_table(n->right, 1, depth+1);
+}
 
 void Huffman::decompress()
 {
