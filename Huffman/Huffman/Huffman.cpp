@@ -130,9 +130,7 @@ void Huffman::compress()
 	}
 */
 
-
 	huffman_tree_create();
-
 	huffman_tree_create_table(head, -1, -1);
 
 /*
@@ -144,6 +142,16 @@ void Huffman::compress()
 	}
 */
 
+	for (int i = 0; i < table.size(); i++)
+	{
+		table_node * tmp = table[i];
+		for (int i = 0; i < tmp->size; i++)
+		{
+			bitrw_write(!!(tmp->data & (1 << i)), 0);
+		}
+	}
+
+	bitrw_flush();
 
 	std::cout << "compress\n";
 }
