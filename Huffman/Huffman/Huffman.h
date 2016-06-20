@@ -10,11 +10,9 @@
 class Huffman
 {
 private:
-	std::string src;
-	std::string dst;
-	
 	std::ifstream in;
 	std::ofstream out;
+	std::ofstream table_file;
 
 	int arr[100];
 
@@ -23,22 +21,9 @@ private:
 		char ch;
 		int freq;
 
-		node*left;
-		node*right;
+		node* left;
+		node* right;
 	};
-
-	struct MyComparator {
-		bool operator() (node *arg1, node *arg2)
-		{
-			return arg1->freq > arg2->freq;
-		}
-	};
-
-	std::priority_queue<node*,
-	                    std::vector<node*>,
-						MyComparator> queue;
-
-	node*head = NULL;
 
 	struct table_node
 	{
@@ -47,14 +32,26 @@ private:
 		int ch;
 	};
 
+	struct MyComparator
+	{
+		bool operator() (node *arg1, node *arg2)
+		{
+			return arg1->freq > arg2->freq;
+		}
+	};
+
+	std::priority_queue<node*, std::vector<node*>, MyComparator> queue;
+	node* head = NULL;
 	std::vector <table_node *> table;
 
+	void create_queue();
 	void huffman_tree_create();
 	void huffman_tree_create_table(node*n, int num, int depth);
+	void flush_table(void);
 
 public:
 	Huffman();
-	Huffman(std::string src, std::string dst);
+	Huffman(std::string src, std::string dst, std::string table);
 	
 	~Huffman();
 	

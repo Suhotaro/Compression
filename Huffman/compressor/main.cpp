@@ -5,7 +5,7 @@
 
 int main()
 {
-	Huffman huffman("files/in.txt", "files/out.txt");
+	Huffman huffman("files/in.txt", "files/out.txt", "files/table.txt");
 	huffman.compress();
 
     return 0;
