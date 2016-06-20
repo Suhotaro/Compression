@@ -10,9 +10,13 @@
 class Huffman
 {
 private:
+
+	std::string src;
+	std::string dst;
+	std::string table_file;
+
 	std::ifstream in;
 	std::ofstream out;
-	std::ofstream table_file;
 
 	int arr[100];
 
@@ -27,9 +31,14 @@ private:
 
 	struct table_node
 	{
-		int data;
-		int size;
 		int ch;
+		int size;
+
+		/* Compressing data */
+		int c_data;
+
+		/* Compressing data */
+		std::vector<int> d_data;
 	};
 
 	struct MyComparator
@@ -44,10 +53,18 @@ private:
 	node* head = NULL;
 	std::vector <table_node *> table;
 
+	/* Compressing methods */
 	void create_queue();
 	void huffman_tree_create();
 	void huffman_tree_create_table(node*n, int num, int depth);
-	void flush_table(void);
+	void table_to_file(void);
+
+	/* Decompressing methods */
+	void table_from_file(void);
+	int table_get_indx(std::vector<int> bits, int &idx);
+
+	/* util */
+	void table_show(int num);
 
 public:
 	Huffman();
